@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>240+ Free Online Tools 2026 | Age Calculator, BMI, SEO &amp; PDF Tools</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="description" content="240+ free online tools 2026 — Age Calculator, BMI, Currency Converter, SEO, PDF &amp; image tools. 100% free, no sign-up. Instant results on any device.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ========== NEW HERO SECTION START ========== -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="badge"><i class="fa-solid fa-rocket"></i> 240+ Free Online Tools</span>
+            <h1>Your One-Stop Destination for <span class="highlight">Online Tools!</span></h1>
+            <p>Fast, accurate and 100% free tools to make your daily tasks easier. Save time, boost productivity and do more!</p>
+            
+            <div class="hero-buttons">
+                <a href="#toolsContainer" class="btn-primary" style="text-decoration: none;">
+                    <i class="fa-solid fa-rocket"></i> Explore All Tools <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <button class="btn-secondary">
+                    <i class="fa-solid fa-play"></i> Watch Video
+                </button>
+            </div>
+            
+            <div class="features-list">
+                <span><i class="fa-solid fa-circle-check text-green"></i> No Registration</span>
+                <span><i class="fa-solid fa-circle-check text-green"></i> 100% Free</span>
+                <span><i class="fa-solid fa-circle-check text-green"></i> Safe & Secure</span>
+            </div>
+        </div>
+        
+        <div class="hero-image">
+            <img src="laptop.png" alt="Laptop" class="laptop-img">
+            <div class="floating-icon shield"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="floating-icon bolt"><i class="fa-solid fa-bolt"></i></div>
+            <div class="floating-icon cloud"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+        </div>
+    </section>
+    <!-- ========== NEW HERO SECTION END ========== -->
+  
+    <!-- Categories Bar -->
+    <div class="categories-wrapper">
+        <div class="categories-bar">
+            <div class="browse-btn">
+                <span>Browse<br>by Categories</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+            <a href="#" class="category-item"><i class="fa-solid fa-right-left text-blue"></i> Converters</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-calculator text-purple"></i> Calculators</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-gears text-orange"></i> Generators</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-briefcase text-green"></i> Productivity</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-code text-blue"></i> Developer Tools</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-gamepad text-purple"></i> Fun Tools</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-font text-dark"></i> Text Tools</a>
+            <a href="#" class="category-item"><i class="fa-solid fa-image text-green"></i> Image Tools</a>
+        </div>
+    </div>
+    <!-- Categories Bar End -->
+
+    <!-- ========== TOOLS DASHBOARD START ========== -->
+    <main class="container" id="toolsContainer">
+        <div class="loader">Loading professional tools...</div>
+    </main>
+    <!-- ========== TOOLS DASHBOARD END ========== -->
+
+    <!-- ========== FINAL CLEAN SOCIAL MEDIA FOOTER START ========== -->
+    <footer style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #cbd5e1; padding: 40px 20px 25px; margin-top: 50px; position: relative; overflow: hidden;">
+        <div style="max-width: 1100px; margin: 0 auto; text-align: center;">
+            <p style="font-size: 0.9rem; color: #64748b;">© 2026 <strong style="color: #94a3b8;">Free Online Tools 203</strong>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- ========== MAIN SCRIPT ========== -->
+    <script src="script.js"></script>
+
+    <!-- ========== FINAL FIX SCRIPT (Only for Popular Tools) ========== -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1 second wait for script.js to load and build the dashboard
+        setTimeout(function() {
+            const sections = document.querySelectorAll('.section');
+            
+            // 1. SIRF PEHLE SECTION (Most Popular) KO TARGET KAREIN
+            if (sections.length > 0) {
+                const firstSection = sections[0];
+                const header = firstSection.querySelector('.section-header-with-product');
+                
+                if (header && !header.querySelector('.custom-badge')) {
+                    // Badge
+                    const badge = document.createElement('div');
+                    badge.className = 'custom-badge';
+                    badge.innerHTML = '🔥 Popular Tools';
+                    
+                    // View All Button
+                    const btn = document.createElement('a');
+                    btn.className = 'custom-view-all';
+                    btn.href = 'sitemap.html';
+                    btn.innerHTML = 'View All Tools <i class="fa-solid fa-arrow-right"></i>';
+                    
+                    header.style.cssText = 'display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-bottom: 30px; border-bottom: none; text-align: center;';
+                    
+                    header.insertBefore(badge, header.firstChild);
+                    header.appendChild(btn);
+                }
+
+                // 2. SAHI ICONS LAGAYEIN
+                const cards = firstSection.querySelectorAll('.tool-card');
+                const iconMap = {
+                    'pdf': '<i class="fa-solid fa-file-pdf" style="color:#ef4444;"></i>',
+                    'bmi': '<i class="fa-solid fa-calculator" style="color:#3b82f6;"></i>',
+                    'qr': '<i class="fa-solid fa-qrcode" style="color:#8b5cf6;"></i>',
+                    'currency': '<i class="fa-solid fa-dollar-sign" style="color:#10b981;"></i>',
+                    'password': '<i class="fa-solid fa-lock" style="color:#1e3a8a;"></i>',
+                    'image': '<i class="fa-solid fa-image" style="color:#8b5cf6;"></i>',
+                    'text': '<i class="fa-solid fa-file-lines" style="color:#10b981;"></i>',
+                    'age': '<i class="fa-solid fa-calendar-days" style="color:#f97316;"></i>',
+                    'time': '<i class="fa-solid fa-clock" style="color:#3b82f6;"></i>',
+                    'love': '<i class="fa-solid fa-heart" style="color:#ef4444;"></i>'
+                };
+
+                cards.forEach(card => {
+                    const link = card.querySelector('a');
+                    if (link) {
+                        const toolName = link.innerText.trim();
+                        let iconHTML = '<i class="fa-solid fa-wrench" style="color:#64748b;"></i>'; 
+
+                        for (const key in iconMap) {
+                            if (toolName.toLowerCase().includes(key)) {
+                                iconHTML = iconMap[key];
+                                break;
+                            }
+                        }
+
+                        card.innerHTML = `
+                            <div class="custom-card-icon" style="background: #f8fafc; width: 45px; height: 45px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; font-size: 20px;">
+                                ${iconHTML}
+                            </div>
+                            <div style="flex: 1; text-align: left;">
+                                <div style="font-weight: 600; color: #1e293b; font-size: 15px; line-height: 1.2;">${toolName}</div>
+                            </div>
+                            <i class="fa-solid fa-chevron-right" style="color: #94a3b8; font-size: 14px;"></i>
+                        `;
+                        card.style.display = 'flex';
+                        card.style.alignItems = 'center';
+                        card.style.padding = '15px';
+                        card.style.position = 'relative';
+                    }
+                });
+            }
+        }, 1000);
+    });
+    </script>
+</body>
+</html>
