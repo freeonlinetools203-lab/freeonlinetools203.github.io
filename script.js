@@ -1,75 +1,225 @@
-// =========================================================================
-// 0. FAVICON
-// =========================================================================
-(function() {
-    if (!document.querySelector('link[rel="icon"]')) {
-        const favicon = document.createElement('link');
-        favicon.rel = 'icon';
-        favicon.type = 'image/png';
-        favicon.href = 'https://freeonlinetools203.com/favicon.png';
-        document.head.appendChild(favicon);
-    }
-})();
-
-// =========================================================================
-// 1. CENTRALIZED TOOLS DATABASE (ONLY MOST POPULAR FOR HOME PAGE)
-// =========================================================================
-const toolsDatabase = {
-  catMostPopular: {
-    name: "Our Most Popular Tools",
-    tools: [
-      { name: "PDF Merger", category: "pdf" },
-      { name: "BMI Calculator", category: "health" },
-      { name: "QR Code Generator", category: "utilities" },
-      { name: "Currency Converter", category: "finance" },
-      { name: "Password Generator", category: "security" },
-      { name: "Image Compressor", category: "image" },
-      { name: "Text to Speech", category: "text" },
-      { name: "Age Calculator", category: "age" },
-      { name: "Time Calculator", category: "time" },
-      { name: "Love Calculator", category: "fun" }
-    ]
-  }
+// script.js
+"use strict";
+/* Free Online Tools 203 — shared site script (home + all tool pages) */
+const SITE="https://freeonlinetools203.com/";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const toolName=t=>(t&&typeof t==="object")?t.name:t;
+const toolSub=t=>(t&&typeof t==="object")?t.category:"";
+function isHome(){const p=location.pathname;return document.body?.dataset.page==="home"||p==="/"||p===""||/\/index\.html$/.test(p)}
+/* ================= ORIGINAL LIVE TOOLS DATABASE ================= */
+const toolsDatabase={
+catMostPopular:{name:"✨ Most Popular Tools",tools:["Age Calculator","Dog Age Calculator","What Year Was I Born Calculator","Born Year Age Calculator","Current Year Calculator","Best Lottery Number Generator","Spin The Wheel","Keyword Density Checker"]},
+catAge:{name:"📅 Age Calculator Tools",tools:[{name:"Age Calculator",category:"basic"},{name:"Current Year Calculator",category:"basic"},{name:"What Year Was I Born Calculator",category:"basic"},{name:"Born Year Age Calculator",category:"basic"},{name:"Birth Year Calculator",category:"basic"},{name:"Age In Days Calculator",category:"basic"},{name:"Age In Months Calculator",category:"basic"},{name:"Date of Birth Calculator Year",category:"basic"},{name:"Dog Age Calculator",category:"pet"},{name:"Age Difference Calculator",category:"difference"},{name:"Age Calculator Difference",category:"difference"},{name:"Calculate Age Difference",category:"difference"},{name:"Age Gap Calculator",category:"difference"},{name:"Age Gap Dating Calculator",category:"difference"},{name:"Dating Age Difference Calculator",category:"difference"},{name:"Chronological Age Calculator",category:"health"},{name:"Online Chronological Age Calculator",category:"health"},{name:"Biological Age Calculator",category:"health"},{name:"Free Biological Age Calculator",category:"health"},{name:"Adjusted Age Calculator",category:"health"},{name:"Preemie Adjusted Age Calculator",category:"health"},{name:"Pearson Age Calculator",category:"health"},{name:"Pearson Chronological Age Calculator",category:"health"},{name:"Life Expectancy Calculator",category:"health"},{name:"AI Age Guesser",category:"pet"},{name:"Future Age Predictor",category:"pet"},{name:"Korean Age Calculator",category:"pet"},{name:"Birthday Countdown",category:"pet"},{name:"Happy Birthday Tool",category:"pet"},{name:"Running Age Calculator",category:"pet"},{name:"Running Age Calculator by Date of Birth",category:"pet"},{name:"Age Calculator By Photo",category:"photo"},{name:"Photo Age Calculator",category:"photo"},{name:"Geekzilla Age Calculator",category:"photo"}]},
+catAgeExcel:{name:"📗 Age Calculation in Excel (Guides)",tools:["Excel Formula To Calculate Age","How To Calculate Age In Excel","Calculate Age From DOB In Excel"]},
+catHash:{name:"📱 Social Media Hashtag Tools",tools:[{name:"Instagram Hashtag Generator",category:"platforms"},{name:"LinkedIn Hashtag Generator",category:"platforms"},{name:"Facebook Hashtag Generator",category:"platforms"},{name:"Pinterest Hashtag Generator",category:"platforms"},{name:"TikTok Hashtag Generator",category:"platforms"},{name:"Twitter Hashtag Generator",category:"platforms"},{name:"Threads Hashtag Generator",category:"platforms"},{name:"YouTube Hashtag Generator",category:"platforms"},{name:"AI Hashtag Generator",category:"ai-seo"},{name:"SEO Hashtags Generator",category:"ai-seo"},{name:"Viral Hashtag Generator",category:"ai-seo"},{name:"Random Hashtag Generator",category:"other"},{name:"Trending Hashtags Today",category:"other"},{name:"Social Media Caption Generator",category:"other"}]},
+catSeo:{name:"🔍 SEO Tools",tools:[{name:"SEO Analyzer",category:"analysis"},{name:"SEO Score Checker",category:"analysis"},{name:"Readability Checker",category:"analysis"},{name:"Heading Structure Checker",category:"analysis"},{name:"Image Alt Analyzer",category:"analysis"},{name:"Broken Link Checker",category:"analysis"},{name:"Google Index Checker",category:"analysis"},{name:"Meta Tags Generator",category:"meta-content"},{name:"Meta Tag Analyzer",category:"meta-content"},{name:"SEO Title Generator",category:"meta-content"},{name:"SERP Snippet Preview",category:"meta-content"},{name:"Keyword Density Checker",category:"meta-content"},{name:"Free Backlink Checker",category:"technical"},{name:"XML Sitemap Generator",category:"technical"}]},
+catYoutube:{name:"🎬 YouTube Tools",tools:[{name:"YouTube SEO Score Checker",category:"seo"},{name:"YouTube Keyword Generator",category:"seo"},{name:"YouTube Keyword Research",category:"seo"},{name:"YouTube Channel Analyzer",category:"seo"},{name:"YouTube Channel Comparison",category:"seo"},{name:"YouTube Viral Video Predictor",category:"seo"},{name:"YouTube SEO Checklist Generator",category:"seo"},{name:"YouTube Title Generator",category:"content"},{name:"YouTube Description Generator",category:"content"},{name:"YouTube Video Idea Generator",category:"content"},{name:"YouTube Video Outline Generator",category:"content"},{name:"YouTube Content Planner AI",category:"content"},{name:"YouTube Shorts Hook Generator",category:"content"},{name:"YouTube Shorts Script Generator",category:"content"},{name:"YouTube Shorts Idea Calendar Generator",category:"content"},{name:"YouTube Video Tags Extractor",category:"tags"},{name:"YouTube Video Tags Generator",category:"tags"},{name:"YouTube Hashtag Generator",category:"tags"},{name:"YouTube Thumbnail Downloader",category:"thumbnails"},{name:"YouTube Thumbnail Text Generator",category:"thumbnails"},{name:"YouTube Thumbnail Color Palette Generator",category:"thumbnails"},{name:"YouTube Thumbnail Split Tester",category:"thumbnails"},{name:"YouTube Thumbnail CTR Predictor",category:"thumbnails"},{name:"YouTube Channel Name Generator",category:"channel"},{name:"YouTube Community Post Generator",category:"channel"}]},
+catFun:{name:"🎲 Random & Fun Tools",tools:[{name:"Spin The Wheel",category:"spinners"},{name:"Yes/No Wheel",category:"spinners"},{name:"Decision Roulette",category:"spinners"},{name:"Decision Wheel",category:"spinners"},{name:"Task Spinner",category:"spinners"},{name:"Art Roulette",category:"spinners"},{name:"Chore Wheel",category:"spinners"},{name:"Twister Spinner",category:"spinners"},{name:"Stop Right There Wheel",category:"spinners"},{name:"Color Wheel",category:"spinners"},{name:"Squid Game Spin Wheel",category:"spinners"},{name:"Game Character Spin Wheel",category:"spinners"},{name:"Carnival Game Spin Wheel",category:"spinners"},{name:"Random Name Picker",category:"pickers"},{name:"Name Picker Wheel",category:"pickers"},{name:"Random Number Generator",category:"pickers"},{name:"Prize Wheel",category:"pickers"},{name:"Lucky Prize Wheel",category:"pickers"},{name:"Daily Lucky Number Wheel",category:"pickers"},{name:"Country Picker Wheel",category:"pickers"},{name:"Mystery Gift Wheel",category:"pickers"},{name:"Random Fact Wheel",category:"pickers"},{name:"Random Animal Wheel",category:"pickers"},{name:"Zodiac Wheel",category:"pickers"},{name:"Exercise Wheel",category:"pickers"},{name:"Workout Spinner",category:"pickers"},{name:"Movie Picker Wheel",category:"pickers"},{name:"Holiday Activity Wheel",category:"pickers"},{name:"Icebreaker Wheel",category:"pickers"},{name:"Dinner Spinner",category:"food-drink"},{name:"Food Picker Wheel",category:"food-drink"},{name:"Drink Picker Wheel",category:"food-drink"},{name:"You vs Food Wheel",category:"food-drink"},{name:"Truth or Dare Generator",category:"party-games"},{name:"Sketch or Dare",category:"party-games"},{name:"Dare or Draw",category:"party-games"},{name:"Hot Seat Challenge",category:"party-games"},{name:"Casino Games Wheel",category:"party-games"},{name:"Party Games Spin Wheel",category:"party-games"},{name:"Drinking Game Spin Wheel",category:"party-games"},{name:"Board Game Spin Wheel",category:"party-games"}]},
+catColor:{name:"🎨 Color Tools",tools:[{name:"Color Palette Generator",category:"generators"},{name:"Palette Generator",category:"generators"},{name:"Color Shades Generator",category:"generators"},{name:"Color Gradient Maker",category:"gradients"},{name:"Gradient Maker",category:"gradients"},{name:"Color Contrast Checker",category:"checkers"},{name:"Color Name Finder",category:"checkers"},{name:"Random Color Picker",category:"pickers"},{name:"Color Wheel",category:"pickers"},{name:"Image Color Extractor",category:"pickers"}]},
+catPdf:{name:"📄 PDF Tools",tools:[{name:"PDF Merger",category:"organize"},{name:"PDF Splitter",category:"organize"},{name:"PDF Rotator",category:"organize"},{name:"PDF to Image",category:"to-image"},{name:"PDF to JPG",category:"to-image"},{name:"PDF to PNG",category:"to-image"},{name:"PDF to BMP",category:"to-image"},{name:"PDF to WEBP",category:"to-image"},{name:"PDF to TIFF",category:"to-image"},{name:"PDF to Word",category:"to-document"},{name:"PDF to Excel",category:"to-document"},{name:"PDF to Text",category:"to-document"}]},
+catImage:{name:"🖼️ Image Tools",tools:[{name:"Image Cropper",category:"edit"},{name:"Image Resizer",category:"edit"},{name:"Image Upscaler",category:"edit"},{name:"Image Converter",category:"converters"},{name:"WebP Converter",category:"converters"},{name:"Image to PDF",category:"converters"},{name:"Image Compressor",category:"optimize"},{name:"Image Color Extractor",category:"optimize"}]},
+catPop:{name:"📊 Popular Calculators",tools:[{name:"Age Calculator",category:"age-date"},{name:"Age Difference Calculator",category:"age-date"},{name:"Date Calculator",category:"age-date"},{name:"My Birth Year",category:"age-date"},{name:"Discount Calculator",category:"finance-math"},{name:"Profit & Loss Calculator",category:"finance-math"},{name:"GST Calculator",category:"finance-math"},{name:"Percentage Calculator",category:"finance-math"},{name:"Currency Converter",category:"finance-math"},{name:"GPA Calculator",category:"finance-math"},{name:"Unit Converter",category:"utilities"},{name:"QR Code Generator",category:"utilities"},{name:"Advanced QR Generator",category:"utilities"},{name:"YouTube Thumbnail Downloader",category:"utilities"}]},
+catDev:{name:"🔐 Developer & Security Tools",tools:[{name:"MD5 Hash Generator",category:"hashing"},{name:"SHA-256 Hash Generator",category:"hashing"},{name:"SHA-1 Hash Generator",category:"hashing"},{name:"Base64 Encoder/Decoder",category:"encoders"},{name:"URL Encoder/Decoder",category:"encoders"},{name:"HTML Encoder/Decoder",category:"encoders"},{name:"HTML Minifier Pro",category:"formatters"},{name:"JSON Formatter & Validator",category:"formatters"}]},
+catHealth:{name:"🏃 Health & Fitness",tools:[{name:"BMI Calculator",category:"metrics"},{name:"Body Fat Calculator",category:"metrics"},{name:"Ideal Weight Calculator",category:"metrics"},{name:"Lean Body Mass Calculator",category:"metrics"},{name:"Waist to Hip Calculator",category:"metrics"},{name:"BMR Calculator",category:"nutrition"},{name:"Calorie Calculator",category:"nutrition"},{name:"TDEE Calculator",category:"nutrition"},{name:"Macro Calculator",category:"nutrition"},{name:"Protein Calculator",category:"nutrition"}]},
+catFin:{name:"💰 Financial Tools",tools:[{name:"EMI Calculator",category:"loans"},{name:"Loan Calculator",category:"loans"},{name:"SIP Calculator",category:"loans"},{name:"Zakat Calculator",category:"tax"}]},
+catText:{name:"📝 Text & Writing Tools",tools:[{name:"Word Counter",category:"text-tools"},{name:"Line Counter",category:"text-tools"},{name:"Text Case Converter",category:"text-tools"},{name:"Password Generator",category:"security"},{name:"Password Strength Checker",category:"security"}]},
+catPreg:{name:"🐾 Animal Pregnancy Tools",tools:[{name:"Dog Pregnancy Calculator",category:"pets"},{name:"Cat Pregnancy Calculator",category:"pets"},{name:"Rabbit Pregnancy Calculator",category:"pets"},{name:"Cow Pregnancy Calculator",category:"livestock"},{name:"Goat Pregnancy Calculator",category:"livestock"},{name:"Horse Gestation Calculator",category:"livestock"},{name:"Sheep Pregnancy Calculator",category:"livestock"},{name:"Pig Pregnancy Calculator",category:"livestock"},{name:"Lambing Calculator",category:"livestock"}]},
+catZodiac:{name:"♈ Zodiac & Birthday Tools",tools:[{name:"Zodiac Sign Finder",category:"zodiac"},{name:"Chinese Zodiac Finder",category:"zodiac"},{name:"Birthday Countdown",category:"birthday"},{name:"Happy Birthday Tool",category:"birthday"}]},
+catTime:{name:"⏰ Time Calculators",tools:[{name:"Time Calculator",category:"calculators"},{name:"Date Calculator",category:"calculators"},{name:"Age Calculator",category:"calculators"},{name:"Countdown Timer",category:"timers-clocks"},{name:"World Clock",category:"timers-clocks"}]}
 };
-
-// =========================================================================
-// 2. HELPER FUNCTION - GET URL
-// =========================================================================
-function getUrl(toolName) {
-    let nameStr = (typeof toolName === 'object' && toolName !== null) ? toolName.name : toolName;
-    return "https://freeonlinetools203.com/" + nameStr.toLowerCase().trim().replace(/ /g, '-').replace(/[^\w\-]/g, '') + '.html';
+const toolUrlMap={
+"Age Calculator":"age-calculator.html","Dog Age Calculator":"dog-age-calculator.html","What Year Was I Born Calculator":"what-year-was-i-born.html","Born Year Age Calculator":"born-year-age-calculator.html","Current Year Calculator":"current-year-calculator.html","Chronological Age Calculator":"chronological-age-calculator.html","Online Chronological Age Calculator":"online-chronological-age-calculator.html","Age Calculator Difference":"age-calculator-difference.html","Calculate Age Difference":"calculate-age-difference.html","Age Gap Calculator":"age-gap-calculator.html","Age Gap Dating Calculator":"age-gap-dating-calculator.html","Dating Age Difference Calculator":"dating-age-difference-calculator.html","Biological Age Calculator":"biological-age-calculator.html","Free Biological Age Calculator":"free-biological-age-calculator.html","Adjusted Age Calculator":"adjusted-age-calculator.html","Preemie Adjusted Age Calculator":"preemie-adjusted-age-calculator.html","Pearson Age Calculator":"pearson-age-calculator.html","Pearson Chronological Age Calculator":"pearson-chronological-age-calculator.html","Age Calculator By Photo":"age-calculator-by-photo.html","Photo Age Calculator":"photo-age-calculator.html","Geekzilla Age Calculator":"age-calculator-geekzilla.html","Age In Days Calculator":"age-in-days-calculator.html","Age In Months Calculator":"age-in-months-calculator.html","Birth Year Calculator":"birth-year-calculator.html","Excel Formula To Calculate Age":"excel-formula-to-calculate-age.html","How To Calculate Age In Excel":"how-to-calculate-age-in-excel.html","Calculate Age From DOB In Excel":"calculate-age-from-dob-in-excel.html","AI Age Guesser":"ai-age-guesser.html","Future Age Predictor":"future-age-predictor.html","Korean Age Calculator":"korean-age-calculator.html","Birthday Countdown":"birthday-countdown.html","Happy Birthday Tool":"happy-birthday-tool.html","Life Expectancy Calculator":"life-expectancy-calculator.html","Running Age Calculator":"running-age-calculator.html","Running Age Calculator by Date of Birth":"running-age-calculator-by-date-of-birth.html","Date of Birth Calculator Year":"date-of-birth-calculator-year.html",
+"Keyword Density Checker":"keyword-density-checker.html","Meta Tags Generator":"meta-tags-generator.html","Meta Tag Analyzer":"meta-tag-analyzer.html","Broken Link Checker":"broken-link-checker.html","Free Backlink Checker":"free-backlink-checker.html","Google Index Checker":"google-index-checker.html","SEO Analyzer":"seo-analyzer.html","SEO Score Checker":"seo-score-checker.html","SEO Title Generator":"seo-title-generator.html","SERP Snippet Preview":"serp-snippet-preview.html","Readability Checker":"readability-checker.html","Heading Structure Checker":"heading-structure-checker.html","Image Alt Analyzer":"image-alt-analyzer.html","XML Sitemap Generator":"xml-sitemap-generator.html",
+"Instagram Hashtag Generator":"instagram-hashtag-generator.html","LinkedIn Hashtag Generator":"linkedin-hashtag-generator.html","Facebook Hashtag Generator":"facebook-hashtag-generator.html","Pinterest Hashtag Generator":"pinterest-hashtag-generator.html","AI Hashtag Generator":"ai-hashtag-generator.html","SEO Hashtags Generator":"seo-hashtags-generator.html","Random Hashtag Generator":"random-hashtag-generator.html","TikTok Hashtag Generator":"tiktok-hashtag-generator.html","Twitter Hashtag Generator":"twitter-hashtag-generator.html","Threads Hashtag Generator":"threads-hashtag-generator.html","Trending Hashtags Today":"trending-hashtags-today.html","Viral Hashtag Generator":"viral-hashtag-generator.html","YouTube Hashtag Generator":"youtube-hashtag-generator.html","Social Media Caption Generator":"social-media-caption-generator.html",
+"Dog Pregnancy Calculator":"dog-pregnancy-calculator.html","Cat Pregnancy Calculator":"cat-pregnancy-calculator.html","Cow Pregnancy Calculator":"cow-pregnancy-calculator.html","Rabbit Pregnancy Calculator":"rabbit-pregnancy-calculator.html","Goat Pregnancy Calculator":"goat-pregnancy-calculator.html","Horse Gestation Calculator":"horse-gestation-calculator.html","Sheep Pregnancy Calculator":"sheep-pregnancy-calculator.html","Pig Pregnancy Calculator":"pig-pregnancy-calculator.html","Lambing Calculator":"lambing-calculator.html",
+"MD5 Hash Generator":"md5-generator.html","SHA-256 Hash Generator":"sha256-generator.html","SHA-1 Hash Generator":"sha1-generator.html","Base64 Encoder/Decoder":"base64-encoder-decoder.html","URL Encoder/Decoder":"url-encoder-decoder.html","HTML Encoder/Decoder":"html-encoder-decoder.html","HTML Minifier Pro":"html-minifier-pro.html","JSON Formatter & Validator":"json-formatter-validator.html",
+"Color Palette Generator":"color-palette-generator.html","Palette Generator":"palette-generator.html","Color Shades Generator":"color-shades-generator.html","Color Gradient Maker":"color-gradient-maker.html","Color Contrast Checker":"color-contrast-checker.html","Color Name Finder":"color-name-finder.html","Random Color Picker":"random-color-picker.html","Color Wheel":"color-wheel-seo.html","Image Color Extractor":"image-color-extractor.html","Gradient Maker":"gradient-maker.html",
+"Unit Converter":"unit-converter.html","Age Difference Calculator":"age-difference-calculator.html","Discount Calculator":"discount-calculator.html","Profit & Loss Calculator":"profit-loss-calculator.html","GPA Calculator":"gpa-calculator.html","GST Calculator":"gst-calculator.html","Percentage Calculator":"percentage-calculator.html","Date Calculator":"date-calculator.html","QR Code Generator":"qr-code-generator.html","Advanced QR Generator":"advanced-qr-generator.html","YouTube Thumbnail Downloader":"youtube-thumbnail-downloader.html","Currency Converter":"currency-converter.html","My Birth Year":"my-birth-year.html",
+"BMI Calculator":"bmi-calculator.html","BMR Calculator":"bmr-calculator.html","Calorie Calculator":"calorie-calculator.html","TDEE Calculator":"tdee-calculator.html","Body Fat Calculator":"body-fat-calculator.html","Ideal Weight Calculator":"ideal-weight-calculator.html","Lean Body Mass Calculator":"lean-body-mass-calculator.html","Macro Calculator":"macro-calculator.html","Protein Calculator":"protein-calculator.html","Waist to Hip Calculator":"waist-to-hip-calculator.html",
+"EMI Calculator":"emi-calculator.html","Loan Calculator":"loan-calculator.html","Zakat Calculator":"zakat-calculator.html","SIP Calculator":"sip-calculator.html",
+"Word Counter":"word-counter.html","Line Counter":"line-counter.html","Text Case Converter":"text-case-converter.html","Password Generator":"password-generator.html","Password Strength Checker":"password-checker.html",
+"PDF Merger":"pdf-merger.html","PDF Splitter":"pdf-splitter.html","PDF to Image":"pdf-to-image.html","PDF to JPG":"pdf-to-jpg.html","PDF to PNG":"pdf-to-png.html","PDF to BMP":"pdf-to-bmp.html","PDF to WEBP":"pdf-to-webp.html","PDF to TIFF":"pdf-to-tiff.html","PDF to Word":"pdf-to-word.html","PDF to Excel":"pdf-to-excel.html","PDF to Text":"pdf-to-text.html","PDF Rotator":"pdf-rotator.html",
+"Image Converter":"image-converter.html","Image Cropper":"image-cropper.html","Image Resizer":"image-resizer.html","Image to PDF":"image-to-pdf.html","Image Upscaler":"image-upscaler.html","Image Compressor":"image-compressor.html","WebP Converter":"webp-converter.html",
+"Zodiac Sign Finder":"zodiac-sign-finder.html","Chinese Zodiac Finder":"chinese-zodiac-finder.html","Time Calculator":"time-calculator.html","Countdown Timer":"countdown-timer.html","World Clock":"world-clock.html",
+"Spin The Wheel":"spin-the-wheel.html","Yes/No Wheel":"yes-no-wheel.html","Decision Roulette":"decision-roulette.html","Random Name Picker":"random-name-picker.html","Name Picker Wheel":"name-picker-wheel.html","Random Number Generator":"best-lottery-number-generator.html","Best Lottery Number Generator":"best-lottery-number-generator.html","Prize Wheel":"prize-wheel.html","Lucky Prize Wheel":"lucky-prize-wheel.html","Daily Lucky Number Wheel":"daily-lucky-number-wheel.html","Task Spinner":"task-spinner.html","Art Roulette":"art-roulette-seo.html","Chore Wheel":"chore-wheel-seo.html","Country Picker Wheel":"country-picker-wheel-seo.html","Decision Wheel":"decision-wheel.html","Dinner Spinner":"dinner-spinner.html","Icebreaker Wheel":"icebreaker-wheel-seo.html","Random Fact Wheel":"random-fact-wheel-seo.html","Random Animal Wheel":"random-animal-wheel.html","Zodiac Wheel":"zodiac-wheel.html","Twister Spinner":"twister-spinner-seo.html","Truth or Dare Generator":"truth-or-dare-generator.html","Sketch or Dare":"sketch-or-dare-seo.html","Dare or Draw":"dare-or-draw-seo.html","Hot Seat Challenge":"hot-seat-challenge-seo.html","Stop Right There Wheel":"stop-right-there-wheel.html","Holiday Activity Wheel":"holiday-wheel.html","Food Picker Wheel":"food-picker-wheel.html","Drink Picker Wheel":"drink-wheel.html","Exercise Wheel":"exercise-wheel.html","Workout Spinner":"workout-spinner.html","Movie Picker Wheel":"movie-picker-wheel.html","You vs Food Wheel":"you-vs-food-wheel.html","Mystery Gift Wheel":"mystery-gift-wheel.html","Casino Games Wheel":"casino-games-wheel.html","Squid Game Spin Wheel":"squid-game-wheel.html","Game Character Spin Wheel":"game-character-spin-wheel.html","Party Games Spin Wheel":"party-games-spin-wheel.html","Drinking Game Spin Wheel":"drinking-game-spin-wheel.html","Board Game Spin Wheel":"board-game-spin-wheel.html","Carnival Game Spin Wheel":"carnival-game-spin-wheel.html",
+"YouTube SEO Score Checker":"youtube-seo-score-checker.html","YouTube Keyword Generator":"youtube-keyword-generator.html","YouTube Keyword Research":"youtube-keyword-research.html","YouTube Channel Analyzer":"youtube-channel-analyzer.html","YouTube Channel Comparison":"youtube-channel-comparison.html","YouTube Viral Video Predictor":"youtube-viral-video-predictor.html","YouTube SEO Checklist Generator":"youtube-seo-checklist-generator.html","YouTube Title Generator":"youtube-title-generator.html","YouTube Description Generator":"youtube-description-generator.html","YouTube Video Idea Generator":"youtube-video-idea-generator.html","YouTube Video Outline Generator":"youtube-video-outline-generator.html","YouTube Content Planner AI":"youtube-content-planner-ai.html","YouTube Video Tags Extractor":"youtube-video-tags-extractor.html","YouTube Video Tags Generator":"youtube-video-tags-generator.html","YouTube Thumbnail Text Generator":"youtube-thumbnail-text-generator.html","YouTube Thumbnail Color Palette Generator":"youtube-thumbnail-color-palette-generator.html","YouTube Thumbnail Split Tester":"youtube-thumbnail-split-tester.html","YouTube Thumbnail CTR Predictor":"thumbnail-ctr-predictor.html","YouTube Shorts Hook Generator":"youtube-shorts-hook-generator.html","YouTube Shorts Script Generator":"youtube-shorts-script-generator.html","YouTube Shorts Idea Calendar Generator":"youtube-shorts-idea-calendar-generator.html","YouTube Channel Name Generator":"youtube-channel-name-generator.html","YouTube Community Post Generator":"youtube-community-post-generator.html"
+};
+const ORDER=["catMostPopular","catAge","catAgeExcel","catZodiac","catTime","catHash","catSeo","catYoutube","catFun","catColor","catPdf","catImage","catPop","catDev","catHealth","catFin","catText","catPreg"];
+const CAT_META={
+catMostPopular:{icon:"✨",g:["#fbbf24","#d97706"],short:"Popular"},catAge:{icon:"📅",g:["#60a5fa","#1d4ed8"],short:"Age Tools"},catAgeExcel:{icon:"📗",g:["#4ade80","#16a34a"],short:"Excel Guides"},catZodiac:{icon:"♈",g:["#c084fc","#7c3aed"],short:"Zodiac"},catTime:{icon:"⏰",g:["#2dd4bf","#0d9488"],short:"Time"},catHash:{icon:"📱",g:["#f472b6","#db2777"],short:"Social Media"},catSeo:{icon:"🔍",g:["#818cf8","#4f46e5"],short:"SEO"},catYoutube:{icon:"🎬",g:["#f87171","#dc2626"],short:"YouTube"},catFun:{icon:"🎡",g:["#e879f9","#c026d3"],short:"Fun & Wheels"},catColor:{icon:"🎨",g:["#fb923c","#ea580c"],short:"Color"},catPdf:{icon:"📄",g:["#ff6b6b","#e11d48"],short:"PDF"},catImage:{icon:"🖼️",g:["#a78bfa","#6d28d9"],short:"Image"},catPop:{icon:"🧮",g:["#38bdf8","#0284c7"],short:"Calculators"},catDev:{icon:"🔐",g:["#6366f1","#4338ca"],short:"Developer"},catHealth:{icon:"🏃",g:["#34d399","#059669"],short:"Health"},catFin:{icon:"💰",g:["#facc15","#ca8a04"],short:"Finance"},catText:{icon:"📝",g:["#22d3ee","#0891b2"],short:"Text"},catPreg:{icon:"🐾",g:["#fcd34d","#f59e0b"],short:"Animal Care"}
+};
+const POPULAR=[
+["PDF Merger","Combine PDF files","📄",["#ff6b6b","#e11d48"]],
+["BMI Calculator","Check your BMI easily","🧮",["#60a5fa","#1d4ed8"]],
+["QR Code Generator","Create QR codes","🔳",["#c084fc","#7c3aed"]],
+["Currency Converter","Convert any currency","💵",["#34d399","#059669"]],
+["Password Generator","Generate strong passwords","🔒",["#38bdf8","#0284c7"]],
+["Image Compressor","Compress images","🖼️",["#a78bfa","#6d28d9"]],
+["Age Calculator","Find your age instantly","📅",["#fbbf24","#d97706"]],
+["Spin The Wheel","Random decisions","🎡",["#f472b6","#db2777"]],
+["Keyword Density Checker","Analyze keyword usage","🔍",["#818cf8","#4f46e5"]],
+["Word Counter","Count words & characters","📝",["#22d3ee","#0891b2"]]
+];
+function getUrl(t){const n=toolName(t);return SITE+(toolUrlMap[n]||n.toLowerCase().trim().replace(/&/g,"and").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")+".html")}
+function cleanCatName(n){return n.replace(/[^\w\s&-]/g,"").trim()}
+function allTools(){const seen=new Set(),out=[];ORDER.forEach(k=>toolsDatabase[k].tools.forEach(t=>{const n=toolName(t);if(!seen.has(n)){seen.add(n);out.push({name:n,cat:k,sub:toolSub(t)})}}));Object.keys(toolUrlMap).forEach(n=>{if(!seen.has(n)){seen.add(n);out.push({name:n,cat:"catMostPopular",sub:""})}});return out}
+const ALL_TOOLS=allTools();
+/* ================= UI HELPERS ================= */
+function toast(msg,type="success"){let box=$("#toasts");if(!box){box=document.createElement("div");box.id="toasts";document.body.appendChild(box)}while(box.children.length>=4)box.firstChild.remove();const t=document.createElement("div");t.className="toast "+type;t.innerHTML=(type==="error"?"⚠️":type==="info"?"ℹ️":"✅")+" <span>"+esc(msg)+"</span>";box.appendChild(t);requestAnimationFrame(()=>t.classList.add("show"));setTimeout(()=>{t.classList.remove("show");setTimeout(()=>t.remove(),320)},3200)}
+window.showToast=toast;
+function cardHTML(name,catKey,sub="",i=0,meta){const m=meta||CAT_META[catKey]||CAT_META.catMostPopular;return `<a class="tool-card" href="${getUrl(name)}" data-name="${esc(name.toLowerCase())}" data-subcat="${esc(sub)}" style="--g1:${m.g[0]};--g2:${m.g[1]};animation-delay:${Math.min(i*25,300)}ms"><span class="tile">${m.icon}</span><span class="tc-meta"><b>${esc(name)}</b><small>${esc(cleanCatName(toolsDatabase[catKey]?.name||"Tool"))}</small></span><span class="go">→</span></a>`}
+function hl(name,q){const i=name.toLowerCase().indexOf(q.toLowerCase());if(i<0)return esc(name);return esc(name.slice(0,i))+"<mark>"+esc(name.slice(i,i+q.length))+"</mark>"+esc(name.slice(i+q.length))}
+/* ================= HOME STATE / RENDER ================= */
+const state={cat:"all",query:"",sort:"default"};
+function sortTools(arr){if(state.sort==="az")return[...arr].sort((a,b)=>toolName(a).localeCompare(toolName(b)));if(state.sort==="za")return[...arr].sort((a,b)=>toolName(b).localeCompare(toolName(a)));return arr}
+function renderPopular(){$("#popGrid").innerHTML=POPULAR.map((p,i)=>{const[n,d,ic,g]=p;return `<a class="tool-card" href="${getUrl(n)}" style="--g1:${g[0]};--g2:${g[1]};animation-delay:${i*40}ms"><span class="tile">${ic}</span><span class="tc-meta"><b>${esc(n)}</b><small>${esc(d)}</small></span><span class="go">→</span></a>`}).join("")}
+function renderCats(){
+  const featured=["catAge","catHash","catSeo","catYoutube","catFun","catPdf","catImage","catPop"];
+  $("#catChips").innerHTML=featured.map(k=>{const m=CAT_META[k];return `<button class="cat-chip" data-jump="${k}"><span class="ci">${m.icon}</span>${m.short}<small>${toolsDatabase[k].tools.length} tools</small></button>`}).join("");
+  $("#pillRow").innerHTML=`<button class="pill on" data-cat="all">All <small>${ALL_TOOLS.length}</small></button>`+ORDER.map(k=>`<button class="pill" data-cat="${k}">${CAT_META[k].short} <small>${toolsDatabase[k].tools.length}</small></button>`).join("");
+  $("#mpCats").innerHTML=ORDER.map(k=>`<button class="pill" data-jump="${k}">${CAT_META[k].icon} ${CAT_META[k].short}</button>`).join("");
+  $("#ddCats").innerHTML=`<div class="dd-h">Browse categories</div>`+ORDER.map(k=>`<button class="dd-item" data-jump="${k}"><span>${CAT_META[k].icon}</span>${cleanCatName(toolsDatabase[k].name)}<small>${toolsDatabase[k].tools.length}</small></button>`).join("");
+  $("#ddTools").innerHTML=`<div class="dd-cols"><div><div class="dd-h">Popular tools</div>${POPULAR.slice(0,6).map(p=>`<a class="dd-item" href="${getUrl(p[0])}"><span>${p[2]}</span>${esc(p[0])}</a>`).join("")}</div><div><div class="dd-h">Quick links</div><a class="dd-item" href="#toolsDashboard" data-jump="all"><span>🧰</span>Browse all ${ALL_TOOLS.length} tools</a><a class="dd-item" href="#popular"><span>🔥</span>Most popular</a><a class="dd-item" href="#about"><span>✨</span>Why choose us</a><a class="dd-item" href="#seoArticle"><span>📚</span>Tools guide &amp; FAQ</a><a class="dd-item" href="${SITE}sitemap.html"><span>🗺️</span>Full sitemap</a></div></div>`;
+  $("#footTools").innerHTML=POPULAR.slice(0,5).map(p=>`<a href="${getUrl(p[0])}">${p[2]} ${esc(p[0])}</a>`).join("")+`<a href="${SITE}sitemap.html">🗺️ View All ${ALL_TOOLS.length} Tools</a>`;
+  $("#heroToolCount").textContent=ALL_TOOLS.length+"+";
+  $("#toolCount").textContent=ALL_TOOLS.length;
 }
-
-// =========================================================================
-// 3. RENDER DASHBOARD
-// =========================================================================
-function renderDashboard() {
-    const container = document.getElementById('toolsContainer');
-    if (!container) return;
-    
-    let html = '';
-    const cat = toolsDatabase.catMostPopular;
-
-    let visibleToolsHTML = cat.tools.map(tool => {
-        let nameStr = tool.name;
-        return `<div class="tool-card" data-category="${tool.category}"><a href="${getUrl(nameStr)}">${nameStr}</a></div>`;
-    }).join('');
-
-    html += `<div class="section" data-category="catMostPopular" id="section_catMostPopular">
-        <div class="section-header-with-product">
-            <h2>${cat.name}</h2>
-        </div>
-        <div class="tools-grid" id="grid_catMostPopular">
-            ${visibleToolsHTML}
-        </div>
-    </div>`;
-
-    container.innerHTML = html;
+function sectionHTML(key){
+  const cat=toolsDatabase[key],m=CAT_META[key];let tools=sortTools(cat.tools);const hasSub=tools.some(t=>typeof t==="object");const subs=[...new Set(tools.map(toolSub).filter(Boolean))];
+  const limit=12,visible=tools.slice(0,limit),hidden=tools.slice(limit);
+  const tabs=hasSub?`<div class="dash-tabs" data-tabs="${key}"><button class="dash-tab on" data-filter="all">All Tools</button>${subs.map(s=>`<button class="dash-tab" data-filter="${esc(s)}">${esc(s.charAt(0).toUpperCase()+s.slice(1).replace(/-/g," "))}</button>`).join("")}</div>`:"";
+  const search=tools.length>12?`<div class="dash-search"><span>🔍</span><input type="search" data-local="${key}" placeholder="Search inside ${esc(cleanCatName(cat.name))}…"></div>`:"";
+  const cards=visible.map((t,i)=>cardHTML(toolName(t),key,toolSub(t),i)).join("");
+  const more=hidden.length?`<div class="dash-hidden" id="hidden_${key}" hidden style="display:none;grid-column:1/-1"><div class="all-grid">${hidden.map((t,i)=>cardHTML(toolName(t),key,toolSub(t),i)).join("")}</div></div><div class="dash-more"><button data-more="${key}">⬇ Show All ${tools.length} Tools</button></div>`:"";
+  return `<section class="dash-sec" id="section_${key}" data-section="${key}"><div class="dash-head"><span class="tile" style="--g1:${m.g[0]};--g2:${m.g[1]}">${m.icon}</span><h3>${esc(cat.name)}</h3><span class="cnt">${tools.length} tools</span></div>${search}${tabs}<div class="all-grid" data-grid="${key}">${cards}${more}</div></section>`;
 }
-
-// =========================================================================
-// 4. PAGE ONLOAD
-// =========================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    renderDashboard();
-});
+function renderDashboard(){
+  const root=$("#dashboardRoot"),q=state.query.trim().toLowerCase();
+  if(q){
+    let res=ALL_TOOLS.filter(t=>(state.cat==="all"||t.cat===state.cat)&&(t.name+" "+cleanCatName(toolsDatabase[t.cat].name)+" "+t.sub).toLowerCase().includes(q));
+    res=sortTools(res);
+    $("#toolCount").textContent=res.length;$("#toolsEmpty").hidden=res.length>0;
+    root.innerHTML=res.length?`<section class="dash-sec"><div class="dash-head"><span class="tile" style="--g1:#60a5fa;--g2:#1d4ed8">🔍</span><h3>Search results for “${esc(state.query)}”</h3><span class="cnt">${res.length} found</span></div><div class="all-grid">${res.map((t,i)=>cardHTML(t.name,t.cat,t.sub,i)).join("")}</div></section>`:"";
+    return;
+  }
+  $("#toolsEmpty").hidden=true;$("#toolCount").textContent=ALL_TOOLS.length;
+  const keys=state.cat==="all"?ORDER:[state.cat];
+  root.innerHTML=keys.map(sectionHTML).join("");
+}
+function setCat(c,scroll=true){state.cat=c;state.query="";$("#toolSearch").value="";$$("[data-cat]").forEach(el=>el.classList.toggle("on",el.dataset.cat===c));renderDashboard();if(scroll)$("#toolsDashboard").scrollIntoView({behavior:reduced?"auto":"smooth"})}
+function jumpToCategory(k){closeDDs();closeMobile();if(k==="all"){setCat("all",true);return}setCat(k,false);requestAnimationFrame(()=>{$("#section_"+k)?.scrollIntoView({behavior:reduced?"auto":"smooth",block:"start"})})}
+function initDashboardEvents(){
+  const root=$("#dashboardRoot");
+  root.addEventListener("click",e=>{
+    const tab=e.target.closest(".dash-tab");if(tab){const wrap=tab.closest(".dash-tabs"),key=wrap.dataset.tabs,filter=tab.dataset.filter;$$(".dash-tab",wrap).forEach(b=>b.classList.toggle("on",b===tab));const sec=$(`#section_${key}`),hidden=$(`#hidden_${key}`),more=$(`[data-more="${key}"]`,sec);if(hidden){hidden.hidden=filter!=="all";hidden.style.display=filter!=="all"?"block":"none"}if(more)more.parentElement.style.display=filter==="all"?"":"none";$$(".tool-card",sec).forEach(c=>{c.style.display=(filter==="all"||c.dataset.subcat===filter)?"":"none"});const li=$(`[data-local="${key}"]`);if(li)li.value="";return}
+    const more=e.target.closest("[data-more]");if(more){const key=more.dataset.more,hidden=$(`#hidden_${key}`),open=hidden.style.display==="none";hidden.style.display=open?"block":"none";hidden.hidden=!open;more.textContent=open?"⬆ Show Less":`⬇ Show All ${toolsDatabase[key].tools.length} Tools`;if(!open)$(`#section_${key}`).scrollIntoView({behavior:reduced?"auto":"smooth"});return}
+  });
+  root.addEventListener("input",e=>{
+    const li=e.target.closest("[data-local]");if(!li)return;const key=li.dataset.local,q=li.value.toLowerCase().trim(),sec=$(`#section_${key}`),hidden=$(`#hidden_${key}`),more=$(`[data-more="${key}"]`,sec);
+    if(hidden){hidden.hidden=!q;hidden.style.display=q?"block":"none"}if(more)more.parentElement.style.display=q?"none":"";
+    $$(".dash-tab",sec).forEach((b,i)=>b.classList.toggle("on",i===0));
+    $$(".tool-card",sec).forEach(c=>{c.style.display=c.dataset.name.includes(q)?"":"none"});
+  });
+  $("#toolSearch").addEventListener("input",e=>{state.query=e.target.value;renderDashboard()});
+  $("#toolSort").addEventListener("change",e=>{state.sort=e.target.value;renderDashboard()});
+  $("#resetFilters").addEventListener("click",()=>{state.query="";state.cat="all";state.sort="default";$("#toolSearch").value="";$("#toolSort").value="default";setCat("all",false)});
+  document.addEventListener("click",e=>{const j=e.target.closest("[data-jump]");if(j){e.preventDefault();jumpToCategory(j.dataset.jump);return}const c=e.target.closest("[data-cat]");if(c){e.preventDefault();setCat(c.dataset.cat,true);closeDDs();closeMobile()}});
+}
+/* ================= NAV / SEARCH / THEME ================= */
+function closeDDs(){$$(".dd.open").forEach(d=>{d.classList.remove("open");$(".dd-btn",d).setAttribute("aria-expanded","false")})}
+function closeSearch(){$("#searchPop")?.setAttribute("hidden","")}
+function closeMobile(){$("#mobilePanel")?.classList.remove("open");$("#burger")?.setAttribute("aria-expanded","false");if($("#tourOverlay")?.hidden)document.body.style.overflow=""}
+function initNav(){
+  const nav=$("#siteNav"),back=$("#backTop");
+  addEventListener("scroll",()=>{nav.classList.toggle("scrolled",scrollY>10);back.classList.toggle("show",scrollY>500)},{passive:true});
+  back.addEventListener("click",()=>scrollTo({top:0,behavior:reduced?"auto":"smooth"}));
+  $$(".dd-btn").forEach(btn=>btn.addEventListener("click",e=>{e.stopPropagation();const dd=btn.parentElement,was=dd.classList.contains("open");closeDDs();if(!was){dd.classList.add("open");btn.setAttribute("aria-expanded","true")}}));
+  document.addEventListener("click",e=>{if(!e.target.closest(".dd"))closeDDs();if(!e.target.closest(".nav-search"))closeSearch()});
+  const inp=$("#navSearch"),pop=$("#searchPop");let sIdx=0;
+  function run(){const q=inp.value.trim();if(!q){closeSearch();return}const ql=q.toLowerCase();const res=ALL_TOOLS.map(t=>({t,s:t.name.toLowerCase().startsWith(ql)?0:t.name.toLowerCase().includes(ql)?1:2})).filter(x=>x.s<2||(cleanCatName(toolsDatabase[x.t.cat].name)+" "+x.t.sub).toLowerCase().includes(ql)).sort((a,b)=>a.s-b.s||a.t.name.localeCompare(b.t.name)).slice(0,7);sIdx=0;pop.innerHTML=res.length?res.map((x,i)=>`<a class="s-item ${i===0?"act":""}" href="${getUrl(x.t.name)}"><span class="tile sm" style="--g1:${CAT_META[x.t.cat].g[0]};--g2:${CAT_META[x.t.cat].g[1]}">${CAT_META[x.t.cat].icon}</span><span><b>${hl(x.t.name,q)}</b><small>${esc(CAT_META[x.t.cat].short)}</small></span></a>`).join("")+`<button class="dd-item" id="seeAllRes">🔍 See all results in library →</button>`:`<div class="s-none">🔍 <span>No tools found for “${esc(q)}”</span></div>`;pop.hidden=false}
+  inp.addEventListener("input",run);inp.addEventListener("focus",run);
+  inp.addEventListener("keydown",e=>{const items=$$(".s-item",pop);if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();if(!items.length)return;sIdx=(sIdx+(e.key==="ArrowDown"?1:-1)+items.length)%items.length;items.forEach((x,i)=>x.classList.toggle("act",i===sIdx))}else if(e.key==="Enter"){e.preventDefault();if(items[sIdx])location.href=items[sIdx].href;else{state.query=inp.value;$("#toolSearch").value=inp.value;renderDashboard();closeSearch();$("#toolsDashboard").scrollIntoView({behavior:reduced?"auto":"smooth"})}}else if(e.key==="Escape"){closeSearch();inp.blur()}});
+  pop.addEventListener("click",e=>{if(e.target.closest("#seeAllRes")){state.query=inp.value;$("#toolSearch").value=inp.value;renderDashboard();closeSearch();$("#toolsDashboard").scrollIntoView({behavior:reduced?"auto":"smooth"})}});
+  $("#burger").addEventListener("click",()=>{const p=$("#mobilePanel"),open=!p.classList.contains("open");p.classList.toggle("open",open);$("#burger").setAttribute("aria-expanded",open);document.body.style.overflow=open?"hidden":""});
+  $$("#mobilePanel a").forEach(a=>a.addEventListener("click",closeMobile));
+  $("#mSearch").addEventListener("keydown",e=>{if(e.key==="Enter"){state.query=e.target.value;$("#toolSearch").value=state.query;renderDashboard();closeMobile();$("#toolsDashboard").scrollIntoView({behavior:reduced?"auto":"smooth"})}});
+  let theme="light";try{theme=localStorage.getItem("fot-theme")||"light"}catch(e){}setTheme(theme);
+  $("#themeBtn").addEventListener("click",()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark"));
+  const secMap={home:"home",toolsDashboard:"tools",popular:"tools",about:"home"};
+  const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){const k=secMap[en.target.id];$$(".nav-links [data-sec]").forEach(a=>a.classList.toggle("active",a.dataset.sec===k))}}),{rootMargin:"-40% 0px -55% 0px"});
+  Object.keys(secMap).forEach(id=>{const el=document.getElementById(id);if(el)io.observe(el)});
+}
+function setTheme(t){document.documentElement.dataset.theme=t;try{localStorage.setItem("fot-theme",t)}catch(e){}$("#themeBtn")?.setAttribute("aria-label",t==="dark"?"Switch to light mode":"Switch to dark mode")}
+/* ================= MOTION ================= */
+function initMotion(){
+  const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{threshold:.12,rootMargin:"0px 0px -40px"});$$(".rv").forEach(el=>io.observe(el));
+  const cio=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;cio.unobserve(en.target);const el=en.target,target=parseFloat(el.dataset.count),suf=el.dataset.suffix||"";if(reduced){el.textContent=target+suf;return}const t0=performance.now();const step=n=>{const p=clamp((n-t0)/1400,0,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)))+suf;if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}),{threshold:.5});$$("[data-count]").forEach(el=>cio.observe(el));
+  const keys=$("#keys");if(keys)keys.innerHTML="<i></i>".repeat(56)+'<i class="space"></i>';
+  if(reduced||!matchMedia("(pointer:fine)").matches)return;
+  const hero=$(".hero"),bg=$("#heroBg"),layers=$$("[data-depth]");let tx=0,ty=0,cx=0,cy=0;
+  hero.addEventListener("mousemove",e=>{const r=hero.getBoundingClientRect();tx=(e.clientX-r.left)/r.width-.5;ty=(e.clientY-r.top)/r.height-.5});
+  hero.addEventListener("mouseleave",()=>{tx=0;ty=0});
+  (function loop(){cx+=(tx-cx)*.06;cy+=(ty-cy)*.06;layers.forEach(l=>{const d=+l.dataset.depth||10,base=l.classList.contains("laptop-wrap")?"translate(-50%,-50%) ":"";l.style.transform=`${base}translate3d(${(cx*d).toFixed(1)}px,${(cy*d).toFixed(1)}px,0)`});if(bg)bg.style.transform=`translateY(${Math.min(scrollY,700)*.12}px)`;requestAnimationFrame(loop)})();
+}
+/* ================= REVIEWS (localStorage, same key) ================= */
+let selectedStar=0,reviews=[],reviewRAF=0;
+const SAMPLE_REVIEWS=[
+{name:"Michael R.",tool:"Age Calculator",rating:5,comment:"Best age calculator I've ever used! Simple and accurate.",date:new Date(Date.now()-86400000*2).toISOString()},
+{name:"Sarah K.",tool:"BMI Calculator",rating:4,comment:"Very helpful tool! Helped me track my health journey.",date:new Date(Date.now()-86400000*5).toISOString()},
+{name:"David M.",tool:"Keyword Density Checker",rating:5,comment:"Perfect for SEO work. Saves me hours of manual checking.",date:new Date(Date.now()-86400000*10).toISOString()}
+];
+function loadReviews(){try{const s=localStorage.getItem("toolReviews");reviews=s?JSON.parse(s):SAMPLE_REVIEWS;if(!s)localStorage.setItem("toolReviews",JSON.stringify(reviews))}catch(e){reviews=SAMPLE_REVIEWS}renderReviews()}
+function saveReviews(){try{localStorage.setItem("toolReviews",JSON.stringify(reviews))}catch(e){}renderReviews()}
+function renderReviews(){
+  const list=$("#revList");if(!list)return;cancelAnimationFrame(reviewRAF);
+  if(!reviews.length){list.innerHTML='<div class="rev-empty">⭐ Be the first to share your experience!</div>';$("#avgRating").textContent="0";$("#avgStars").textContent="☆☆☆☆☆";$("#totalReviews").textContent="0 reviews";return}
+  const avg=(reviews.reduce((a,r)=>a+r.rating,0)/reviews.length).toFixed(1);$("#avgRating").textContent=avg;$("#avgStars").textContent="★".repeat(Math.round(avg))+"☆".repeat(5-Math.round(avg));$("#totalReviews").textContent=reviews.length+" reviews";
+  const html=[...reviews].reverse().map(r=>{const d=new Date(r.date).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});return `<div class="rev-item"><div class="ri-head"><span class="ri-name">${esc(r.name||"Anonymous")}</span><span class="ri-stars">${"★".repeat(r.rating)+"☆".repeat(5-r.rating)}</span></div><div class="ri-meta">${r.tool?`<span>🛠️ ${esc(r.tool)}</span>`:"<span></span>"}<span>${d}</span></div><p class="ri-text">${esc(r.comment)}</p></div>`}).join("");
+  list.innerHTML=html+(reviews.length>2?html:"");
+  if(!reduced&&reviews.length>2){let pos=0;const step=()=>{pos+=.3;if(pos>=list.scrollHeight/2)pos=0;list.scrollTop=pos;reviewRAF=requestAnimationFrame(step)};reviewRAF=requestAnimationFrame(step);list.onmouseenter=()=>cancelAnimationFrame(reviewRAF);list.onmouseleave=()=>{cancelAnimationFrame(reviewRAF);reviewRAF=requestAnimationFrame(step)}}
+}
+function updateStars(){$$("#starSelector button").forEach((b,i)=>{b.textContent=i<selectedStar?"★":"☆";b.classList.toggle("active",i<selectedStar)})}
+function submitReview(){const name=$("#revName"),tool=$("#revTool"),comment=$("#revComment");if(!comment||comment.value.trim().length<5){toast("Please write at least 5 characters.","error");return}if(!selectedStar){toast("Please select a star rating.","error");return}reviews.push({name:name?.value.trim()||"Anonymous",tool:tool?.value.trim()||"",rating:selectedStar,comment:comment.value.trim(),date:new Date().toISOString()});saveReviews();if(name)name.value="";if(tool)tool.value="";comment.value="";selectedStar=0;updateStars();$("#reviewForm").hidden=true;$("#reviewCtaBox").hidden=false;toast("Thank you! Your feedback helps others.")}
+function initReviews(){if(!$("#revList"))return;loadReviews();$("#reviewCtaBtn")?.addEventListener("click",()=>{$("#reviewForm").hidden=false;$("#reviewCtaBox").hidden=true;selectedStar=5;updateStars();$("#reviewForm").scrollIntoView({behavior:reduced?"auto":"smooth",block:"center"})});$("#revSubmit")?.addEventListener("click",submitReview);$$("#starSelector button").forEach(b=>b.addEventListener("click",()=>{selectedStar=+b.dataset.star;updateStars()}));$("#revComment")?.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.shiftKey){e.preventDefault();submitReview()}})}
+/* ================= TOUR ================= */
+const TOUR=[
+{art:"🧰",title:"Choose a tool",text:`Browse ${ALL_TOOLS.length}+ live tools or search instantly. No sign-up, no installs — every tool opens on its own fast page.`},
+{art:"📂",title:"Pick a category",text:"Age calculators, SEO, YouTube, PDF, image, health, finance, fun wheels and more — all organized in one library."},
+{art:"⚡",title:"Get results instantly",text:"Every tool runs in your browser with live results. Your files and text stay on your device."},
+{art:"📋",title:"Copy or download",text:"One click to copy, export or save your output. Smart tools, simple solutions — always free."}];
+let tourIdx=0,tourTimer=null,tourPaused=false;
+function renderTour(){const s=TOUR[tourIdx],sl=$("#tourSlide");sl.innerHTML=`<div class="tour-art">${s.art}</div><h3>${s.title}</h3><p>${s.text}</p>`;sl.style.animation="none";void sl.offsetWidth;sl.style.animation="";$("#tourDots").innerHTML=TOUR.map((_,i)=>`<button class="${i===tourIdx?"on":""}" data-i="${i}" aria-label="Slide ${i+1}"></button>`).join("");const pr=$("#tourProg");pr.style.animation="none";void pr.offsetWidth;pr.style.animation="";pr.style.animationPlayState=tourPaused?"paused":"running"}
+function tourGo(i){tourIdx=(i+TOUR.length)%TOUR.length;renderTour()}
+function openTour(){tourIdx=0;tourPaused=false;$("#tourPause").textContent="⏸";$("#tourOverlay").hidden=false;document.body.style.overflow="hidden";renderTour();clearInterval(tourTimer);tourTimer=setInterval(()=>{if(!tourPaused)tourGo(tourIdx+1)},4600);$("#tourClose").focus()}
+function closeTour(){clearInterval(tourTimer);$("#tourOverlay").hidden=true;document.body.style.overflow="";$("#tourBtn").focus()}
+function initTour(){if(!$("#tourBtn"))return;$("#tourBtn").addEventListener("click",openTour);$("#tourClose").addEventListener("click",closeTour);$("#tourOverlay").addEventListener("click",e=>{if(e.target===e.currentTarget)closeTour()});$("#tourNext").addEventListener("click",()=>tourGo(tourIdx+1));$("#tourPrev").addEventListener("click",()=>tourGo(tourIdx-1));$("#tourDots").addEventListener("click",e=>{const b=e.target.closest("button");if(b)tourGo(+b.dataset.i)});$("#tourPause").addEventListener("click",()=>{tourPaused=!tourPaused;$("#tourPause").textContent=tourPaused?"▶":"⏸";$("#tourProg").style.animationPlayState=tourPaused?"paused":"running"});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#tourOverlay").hidden)closeTour()})}
+/* ================= SHARE / MISC ================= */
+function sharePage(platform){const url=encodeURIComponent(location.href),title=encodeURIComponent(document.title||"Free Online Tools 203");let u="";if(platform==="whatsapp")u="https://wa.me/?text="+title+"%20"+url;else if(platform==="facebook")u="https://www.facebook.com/sharer/sharer.php?u="+url;else if(platform==="twitter")u="https://twitter.com/intent/tweet?text="+title+"&url="+url;else if(platform==="linkedin")u="https://www.linkedin.com/shareArticle?mini=true&url="+url+"&title="+title;if(u)window.open(u,"_blank","width=600,height=500")}
+window.sharePage=sharePage;
+function copyPageLink(){const url=location.href;if(navigator.clipboard?.writeText)navigator.clipboard.writeText(url).then(()=>toast("Link copied! Share with friends.")).catch(()=>fallbackCopy(url));else fallbackCopy(url)}
+function fallbackCopy(t){const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Link copied!")}catch(e){toast("Copy failed.","error")}ta.remove()}
+window.copyPageLink=copyPageLink;
+function initMisc(){const y=$("#year");if(y)y.textContent=new Date().getFullYear();$$("[data-share]").forEach(b=>b.addEventListener("click",()=>sharePage(b.dataset.share)));$("#copyLink")?.addEventListener("click",copyPageLink);const s=new URLSearchParams(location.search).get("s");if(s){state.query=s;$("#toolSearch").value=s;renderDashboard();setTimeout(()=>$("#toolsDashboard").scrollIntoView({behavior:reduced?"auto":"smooth"}),300)}}
+/* ================= LEGACY TOOL PAGES (navbar + helpers) ================= */
+function generateMobileMenu(){let h=`<ul class="mobile-nav"><li><a href="${SITE}index.html">🏠 Home</a></li><li><a href="${SITE}age-calculator.html">📅 Age Calculator</a></li><li><a href="#" id="mobileToolsToggle">🛠️ All Tools ▾</a><div class="mobile-dropdown-content" id="mobileToolsContent">`;ORDER.forEach(k=>{h+=`<h4>${esc(toolsDatabase[k].name)}</h4>`;toolsDatabase[k].tools.forEach(t=>{h+=`<a href="${getUrl(t)}">${esc(toolName(t))}</a>`})});h+=`</div></li><li><a href="${SITE}about.html">ℹ️ About</a></li><li><a href="${SITE}contact.html">📧 Contact</a></li><li><a href="${SITE}privacy-policy.html">🔒 Privacy</a></li><li><a href="${SITE}terms-conditions.html">📜 Terms</a></li><li><a href="${SITE}disclaimer.html">⚠️ Disclaimer</a></li><li><a href="${SITE}sitemap.html">🗺️ Sitemap</a></li></ul>`;return h}
+function legacyNavbarHTML(){const cols=ORDER.map(k=>`<div class="dropdown-column"><h4>${esc(toolsDatabase[k].name)}</h4>${toolsDatabase[k].tools.map(t=>`<a href="${getUrl(t)}">${esc(toolName(t))}</a>`).join("")}</div>`).join("");return `<div class="megamenu-container"><div class="megamenu-wrapper"><div class="megamenu-logo"><a href="${SITE}index.html"><img src="${SITE}logo.png" alt="Free Online Tools"><span>✨ Free Online Tools</span></a></div><ul class="megamenu-nav"><li><a href="${SITE}index.html">🏠 Home</a></li><li><a href="${SITE}age-calculator.html">📅 Age Calculator</a></li><li class="has-dropdown"><a href="#">🛠️ All Tools</a><div class="mega-dropdown"><div class="dropdown-scroll"><div class="dropdown-grid">${cols}</div></div></div></li><li><a href="${SITE}about.html">ℹ️ About</a></li><li><a href="${SITE}contact.html">📧 Contact</a></li><li><a href="${SITE}privacy-policy.html">🔒 Privacy</a></li><li><a href="${SITE}sitemap.html">🗺️ Sitemap</a></li></ul><button class="mobile-toggle" id="mobileToggle" aria-label="Menu">☰</button></div><div class="mobile-menu" id="mobileMenu">${generateMobileMenu()}</div></div>`}
+function populateFooter(){const f=$("#footerPopularTools");if(!f)return;f.innerHTML="<h4>Popular Tools</h4>"+toolsDatabase.catPop.tools.slice(0,6).map(t=>`<a href="${getUrl(t)}">${esc(toolName(t))}</a>`).join("")+`<a href="${SITE}sitemap.html">🗺️ Sitemap</a>`}
+function initLegacy(){
+  if(!document.querySelector('link[rel="icon"]')){const l=document.createElement("link");l.rel="icon";l.href=SITE+"favicon.png";document.head.appendChild(l)}
+  if(!$(".megamenu-container"))document.body.insertAdjacentHTML("afterbegin",legacyNavbarHTML());
+  const mt=$("#mobileToggle"),mm=$("#mobileMenu");mt?.addEventListener("click",()=>mm.classList.toggle("open"));
+  document.addEventListener("click",e=>{if(e.target?.id==="mobileToolsToggle"){e.preventDefault();$("#mobileToolsToggle").classList.toggle("open");$("#mobileToolsContent").classList.toggle("open")}});
+  populateFooter();if($("#revList"))loadReviews();
+  if(!/sitemap\.html$/.test(location.pathname)){const cta=`<div style="max-width:1200px;margin:30px auto 20px;padding:0 20px;text-align:center"><a href="${SITE}sitemap.html" style="display:inline-block;background:linear-gradient(135deg,#14532d,#16a34a);color:#fff;padding:14px 40px;border-radius:999px;font-weight:800;box-shadow:0 8px 20px rgba(20,83,45,.25)">🗺️ View All ${ALL_TOOLS.length}+ Tools</a></div>`;const f=document.querySelector("footer");f?f.insertAdjacentHTML("beforebegin",cta):document.body.insertAdjacentHTML("beforeend",cta)}
+  if(!$("#backTop")){const b=document.createElement("button");b.id="backTop";b.textContent="↑";b.setAttribute("aria-label","Back to top");document.body.appendChild(b);addEventListener("scroll",()=>b.classList.toggle("show",scrollY>400),{passive:true});b.addEventListener("click",()=>scrollTo({top:0,behavior:reduced?"auto":"smooth"}))}
+}
+/* ================= BOOT ================= */
+function boot(){
+  if(isHome()){renderCats();renderPopular();renderDashboard();initDashboardEvents();initNav();initMotion();initReviews();initTour();initMisc();}
+  else initLegacy();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
